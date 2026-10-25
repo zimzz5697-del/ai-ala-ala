@@ -1,36 +1,19 @@
 /**
  * ============================================================
- * Cloudflare Worker — Bye Zimzz Proxy (v4)
+ * Cloudflare Worker — Bye Zimzz AI Proxy (Final v5)
  * ============================================================
  * Frontend TANPA LOGIN — langsung bisa dipakai.
+ * Support mode: "code" (buat code) & "soal" (jawab soal)
  * 
  * ENV VARS di Cloudflare Dashboard (Settings → Variables):
  * 
  *   WAJIB:
- *     API_KEY   (Secret)  — API key provider kamu
+ *     API_KEY   (Secret)  — API key provider
  *     PROVIDER  (Text)    — "groq" | "gemini" | "openai"
  * 
  *   OPSIONAL:
  *     MODEL           (Text) — override model default
  *     ALLOWED_ORIGIN  (Text) — default "*"
- * 
- * ============================================================
- * Contoh setting:
- * 
- *   GROQ (gratis, cepat):
- *     API_KEY  = gsk_xxxxxxxxxxxxxxxx
- *     PROVIDER = groq
- *     → model default: llama-3.3-70b-versatile
- * 
- *   GEMINI (gratis):
- *     API_KEY  = AIzaSyXXXXXXXXXXXXXXXX
- *     PROVIDER = gemini
- *     → model default: gemini-2.0-flash
- * 
- *   OPENAI (berbayar):
- *     API_KEY  = sk-proj-xxxxxxxxxxxxxxxx
- *     PROVIDER = openai
- *     → model default: gpt-4o-mini
  * ============================================================
  */
 

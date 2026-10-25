@@ -1,236 +1,85 @@
-// ============================================
-// KONFIGURASI - GANTI INI SETELAH DEPLOY WORKER
-// ============================================
-const WORKER_URL = 'https://codeai-proxy.NAMA-KAMU.workers.dev';
-// Contoh: 'https://codeai-proxy.johndoe.workers.dev'
+/* ============ LOGIN SCREEN ============ */
+.login-screen {
+    position: fixed; inset: 0;
+    background: radial-gradient(circle at top, #1a1a2e 0%, #0d0d0d 100%);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; padding: 1rem;
+}
+.login-screen.hidden { display: none !important; }
 
-// ============ ELEMENTS ============
-const promptInput = document.getElementById('promptInput');
-const sendBtn = document.getElementById('sendBtn');
-const messagesEl = document.getElementById('messages');
-const welcomeScreen = document.getElementById('welcomeScreen');
-const chatContainer = document.getElementById('chatContainer');
-const newChatBtn = document.getElementById('newChatBtn');
-const newChatLargeBtn = document.getElementById('newChatLargeBtn');
-const languageBtn = document.getElementById('languageBtn');
-const languageSelect = document.getElementById('languageSelect');
-const langLabel = document.getElementById('langLabel');
-const previewModal = document.getElementById('previewModal');
-const closePreview = document.getElementById('closePreview');
-const previewFrame = document.getElementById('previewFrame');
-const toast = document.getElementById('toast');
-const menuToggle = document.getElementById('menuToggle');
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebarOverlay');
-const historyList = document.getElementById('historyList');
+.login-box {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    text-align: center;
+    max-width: 400px; width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.login-logo {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, #4d6bfe, #7c3aed);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; color: white;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 8px 32px var(--accent-glow);
+}
+.login-box h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.login-box > p { color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem; }
+.login-note { font-size: 0.7rem; color: var(--text-muted); margin-top: 1.5rem !important; }
 
-// ============ STATE ============
-let isGenerating = false;
-let chatHistory = [];
+.app-container { display: flex; height: 100vh; overflow: hidden; }
+.app-container.hidden { display: none !important; }
 
-// ============ MOBILE SIDEBAR ============
-menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    sidebarOverlay.classList.toggle('active');
-});
+.avatar-img {
+    width: 32px; height: 32px; border-radius: 50%;
+    object-fit: cover; flex-shrink: 0;
+}
+.logout-btn {
+    width: 100%; margin-top: 0.75rem;
+    padding: 0.6rem; background: var(--bg-tertiary);
+    border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text-secondary); cursor: pointer;
+    font-size: 0.8rem; font-weight: 500;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    transition: all 0.2s;
+}
+.logout-btn:hover { background: #ef4444; color: white; border-color: #ef4444; }
 
-sidebarOverlay.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    sidebarOverlay.classList.remove('active');
-});
-
-// ============ LANGUAGE SELECT ============
-languageBtn.addEventListener('click', () => languageSelect.click());
-
-languageSelect.addEventListener('change', () => {
-    langLabel.textContent = languageSelect.options[languageSelect.selectedIndex].text;
-});
-
-// ============ TEXTAREA AUTO RESIZE ============
-promptInput.addEventListener('input', () => {
-    promptInput.style.height = 'auto';
-    promptInput.style.height = Math.min(promptInput.scrollHeight, 200) + 'px';
-    sendBtn.disabled = !promptInput.value.trim() || isGenerating;
-});
-
-promptInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        if (!sendBtn.disabled) sendBtn.click();
-    }
-});
-
-// ============ SUGGESTION CARDS ============
-document.querySelectorAll('.suggestion-card').forEach(card => {
-    card.addEventListener('click', () => {
-        promptInput.value = card.dataset.prompt;
-        promptInput.dispatchEvent(new Event('input'));
-        promptInput.focus();
-    });
-});
-
-// ============ NEW CHAT ============
-function startNewChat() {
-    messagesEl.innerHTML = '';
-    welcomeScreen.classList.remove('hidden');
-    chatHistory = [];
-    promptInput.value = '';
-    promptInput.style.height = 'auto';
-    sendBtn.disabled = true;
-    sidebar.classList.remove('open');
-    sidebarOverlay.classList.remove('active');
+/* ============ MODE TABS ============ */
+.mode-tabs {
+    display: flex; gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-secondary);
+    flex-shrink: 0;
+}
+.mode-tab {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text-secondary);
+    cursor: pointer; font-size: 0.82rem; font-weight: 500;
+    display: flex; align-items: center; gap: 0.4rem;
+    transition: all 0.2s;
+}
+.mode-tab:hover { background: var(--bg-hover); color: var(--text-primary); }
+.mode-tab.active {
+    background: var(--accent); color: white; border-color: var(--accent);
 }
 
-newChatBtn.addEventListener('click', startNewChat);
-newChatLargeBtn.addEventListener('click', startNewChat);
-
-// ============ PREVIEW CLOSE ============
-closePreview.addEventListener('click', () => previewModal.classList.remove('active'));
-previewModal.addEventListener('click', (e) => {
-    if (e.target === previewModal) previewModal.classList.remove('active');
-});
-
-// ============ SEND MESSAGE ============
-sendBtn.addEventListener('click', async () => {
-    const prompt = promptInput.value.trim();
-    if (!prompt || isGenerating) return;
-
-    welcomeScreen.classList.add('hidden');
-    addUserMessage(prompt);
-    chatHistory.push({ role: 'user', content: prompt });
-
-    promptInput.value = '';
-    promptInput.style.height = 'auto';
-    sendBtn.disabled = true;
-    isGenerating = true;
-
-    const typingEl = addTypingIndicator();
-
-    try {
-        const language = languageSelect.value;
-        const result = await callAI(prompt, language);
-        
-        typingEl.remove();
-        chatHistory.push({ role: 'assistant', content: result.code });
-        addAIMessage(result.code, result.language);
-        addToHistory(prompt);
-
-    } catch (error) {
-        typingEl.remove();
-        addErrorMessage(error.message);
-        showToast('Gagal: ' + error.message, 'error');
-    } finally {
-        isGenerating = false;
-        sendBtn.disabled = !promptInput.value.trim();
-    }
-});
-
-// ============ AI API CALL (via Worker Proxy) ============
-async function callAI(prompt, language) {
-    const response = await fetch(WORKER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            prompt: prompt,
-            language: language,
-            history: chatHistory.slice(-6)
-        })
-    });
-
-    if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error || `Server Error ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    if (data.error) {
-        throw new Error(data.error);
-    }
-
-    let code = data.code || '';
-    
-    // Clean markdown
-    code = code.replace(/```[\w]*\n?/g, '').replace(/```/g, '');
-
-    // Detect language
-    let detectedLang = language;
-    if (language === 'auto') {
-        if (code.includes('<!DOCTYPE html>') || code.includes('<html')) detectedLang = 'html';
-        else if (code.includes('def ') || code.includes('import ')) detectedLang = 'python';
-        else if (code.includes('<?php')) detectedLang = 'php';
-        else if (code.includes('function ') || code.includes('const ')) detectedLang = 'javascript';
-        else detectedLang = 'javascript';
-    }
-
-    return { code: code.trim(), language: detectedLang };
+/* ============ JAWAB SOAL SPECIFIC ============ */
+.answer-block {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 0.75rem 0;
+    line-height: 1.7;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
-
-// ============ ADD MESSAGE FUNCTIONS ============
-function addUserMessage(text) {
-    const msg = document.createElement('div');
-    msg.className = 'message user';
-    msg.innerHTML = `
-        <div class="msg-avatar">U</div>
-        <div class="msg-content">
-            <div class="msg-bubble">${escapeHtml(text)}</div>
-        </div>
-    `;
-    messagesEl.appendChild(msg);
-    scrollToBottom();
-}
-
-function addAIMessage(code, language) {
-    const msg = document.createElement('div');
-    msg.className = 'message ai';
-    
-    const codeId = 'code-' + Date.now();
-    const langMap = {
-        html: 'html', css: 'css', javascript: 'js', python: 'py',
-        php: 'php', java: 'java', cpp: 'cpp', react: 'jsx',
-        nodejs: 'js', sql: 'sql'
-    };
-    
-    msg.innerHTML = `
-        <div class="msg-avatar"><i class="fas fa-code"></i></div>
-        <div class="msg-content">
-            <div class="msg-bubble">
-                <div class="code-block-wrapper">
-                    <div class="code-header">
-                        <span class="code-lang">
-                            <i class="fas fa-code"></i> ${language.toUpperCase()}
-                        </span>
-                        <div class="code-actions">
-                            <button class="code-action-btn" onclick="copyCode(this, '${codeId}')">
-                                <i class="fas fa-copy"></i> Copy
-                            </button>
-                            ${language === 'html' ? `
-                            <button class="code-action-btn" onclick="previewCode('${codeId}')">
-                                <i class="fas fa-eye"></i> Preview
-                            </button>` : ''}
-                            <button class="code-action-btn" onclick="downloadCode('${codeId}', '${langMap[language] || 'txt'}')">
-                                <i class="fas fa-download"></i> Download
-                            </button>
-                        </div>
-                    </div>
-                    <pre><code id="${codeId}" class="language-${language}">${escapeHtml(code)}</code></pre>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    messagesEl.appendChild(msg);
-    
-    const codeEl = document.getElementById(codeId);
-    if (window.hljs && codeEl) {
-        hljs.highlightElement(codeEl);
-    }
-    
-    scrollToBottom();
-}
-
-function addErrorMessage(error) {
-    const msg = document.createElement('div');
-    msg.className = 'message ai';
-    msg.innerHTML = `
-        <div class="msg-avatar" style="background:#ef4444;color:white"><i class="fas fa-exclamation-triangle"></i></div
+.answer-block strong { color: var(--accent); }

@@ -3,148 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeAI - AI Code Generator</title>
+    <title>CodeAI - AI Code Generator & Jawab Soal</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <div class="logo-icon"><i class="fas fa-code"></i></div>
-                <span class="logo-text">CodeAI</span>
+    <!-- ============ LOGIN SCREEN (WAJIB) ============ -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <div class="login-logo"><i class="fas fa-code"></i></div>
+            <h1>CodeAI</h1>
+            <p>Login dengan Google untuk mulai menggunakan</p>
+            <div id="g_id_onload"
+                 data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+                 data-callback="handleGoogleLogin"
+                 data-auto_prompt="false">
             </div>
-            <button class="new-chat-btn" id="newChatBtn" title="New Chat">
-                <i class="fas fa-plus"></i>
-            </button>
+            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_black"></div>
+            <p class="login-note">Dengan login, kamu setuju menggunakan layanan ini secara bijak.</p>
         </div>
+    </div>
 
-        <button class="new-chat-large" id="newChatLargeBtn">
-            <i class="fas fa-plus"></i>
-            <span>Chat Baru</span>
-        </button>
+    <!-- ============ APP (SETELAH LOGIN) ============ -->
+    <div id="appContainer" class="app-container hidden">
 
-        <div class="chat-history">
-            <div class="history-label">Riwayat</div>
-            <div class="history-list" id="historyList"></div>
-        </div>
-
-        <div class="sidebar-footer">
-            <div class="user-profile">
-                <div class="avatar">U</div>
-                <div class="user-info">
-                    <span class="username">User</span>
-                    <span class="plan">Free Plan</span>
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon"><i class="fas fa-code"></i></div>
+                    <span class="logo-text">CodeAI</span>
                 </div>
+                <button class="new-chat-btn" id="newChatBtn" title="New Chat"><i class="fas fa-plus"></i></button>
             </div>
-        </div>
-    </aside>
 
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+            <button class="new-chat-large" id="newChatLargeBtn"><i class="fas fa-plus"></i><span>Chat Baru</span></button>
 
-    <!-- MAIN AREA -->
-    <main class="main">
-        <header class="topbar">
-            <button class="menu-toggle" id="menuToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="topbar-title">
-                <span class="model-badge">
-                    <i class="fas fa-bolt"></i> CodeAI-V3
-                </span>
+            <div class="chat-history">
+                <div class="history-label">Riwayat</div>
+                <div class="history-list" id="historyList"></div>
             </div>
-            <div class="topbar-actions">
-                <button class="icon-btn" id="shareBtn" title="Share">
-                    <i class="fas fa-share-nodes"></i>
-                </button>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img id="userAvatar" class="avatar-img" src="" alt="User" style="display:none">
+                    <div class="avatar" id="userAvatarFallback">U</div>
+                    <div class="user-info">
+                        <span class="username" id="userName">User</span>
+                        <span class="plan" id="userEmail">-</span>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
-        </header>
+        </aside>
 
-        <div class="chat-container" id="chatContainer">
-            <div class="welcome-screen" id="welcomeScreen">
-                <div class="welcome-logo"><i class="fas fa-code"></i></div>
-                <h1>Halo, saya <span class="gradient-text">CodeAI</span></h1>
-                <p class="welcome-subtitle">Bisa bantu kamu buat code apa hari ini?</p>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-                <div class="suggestion-grid">
-                    <div class="suggestion-card" data-prompt="Buatkan landing page portfolio modern dengan HTML, CSS, dan JavaScript yang responsive">
-                        <div class="suggestion-icon"><i class="fas fa-globe"></i></div>
-                        <div class="suggestion-text">
-                            <strong>Landing Page</strong>
-                            <span>Buat portfolio modern & responsive</span>
+        <!-- MAIN -->
+        <main class="main">
+            <header class="topbar">
+                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+                <div class="topbar-title">
+                    <span class="model-badge"><i class="fas fa-bolt"></i> CodeAI Pro</span>
+                </div>
+                <div class="topbar-actions">
+                    <button class="icon-btn" id="shareBtn" title="Share"><i class="fas fa-share-nodes"></i></button>
+                </div>
+            </header>
+
+            <!-- Mode Tabs -->
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-mode="code"><i class="fas fa-code"></i> Buat Code</button>
+                <button class="mode-tab" data-mode="soal"><i class="fas fa-question-circle"></i> Jawab Soal</button>
+            </div>
+
+            <div class="chat-container" id="chatContainer">
+                <!-- Welcome Code Mode -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-logo"><i class="fas fa-code"></i></div>
+                    <h1>Halo, saya <span class="gradient-text">CodeAI</span></h1>
+                    <p class="welcome-subtitle">Mau buat code apa hari ini?</p>
+                    <div class="suggestion-grid">
+                        <div class="suggestion-card" data-prompt="Buatkan landing page portfolio modern dengan HTML, CSS, dan JavaScript yang responsive">
+                            <div class="suggestion-icon"><i class="fas fa-globe"></i></div>
+                            <div class="suggestion-text"><strong>Landing Page</strong><span>Portfolio modern & responsive</span></div>
                         </div>
-                    </div>
-                    <div class="suggestion-card" data-prompt="Buatkan aplikasi to-do list dengan JavaScript yang bisa add, delete, dan mark as done">
-                        <div class="suggestion-icon"><i class="fas fa-list-check"></i></div>
-                        <div class="suggestion-text">
-                            <strong>To-Do App</strong>
-                            <span>Aplikasi task management</span>
-                        </div>
-                    </div>
-                    <div class="suggestion-card" data-prompt="Buatkan sistem login PHP dengan database MySQL dan session">
-                        <div class="suggestion-icon"><i class="fas fa-lock"></i></div>
-                        <div class="suggestion-text">
-                            <strong>Login System</strong>
-                            <span>PHP + MySQL + Session</span>
-                        </div>
-                    </div>
-                    <div class="suggestion-card" data-prompt="Buatkan REST API dengan Node.js Express untuk crud product">
-                        <div class="suggestion-icon"><i class="fas fa-server"></i></div>
-                        <div class="suggestion-text">
-                            <strong>REST API</strong>
-                            <span>Node.js + Express CRUD</span>
+                        <div class="suggestion-card" data-prompt="Buatkan aplikasi to-do list dengan JavaScript yang bisa add, delete, dan mark as done">
+                            <div class="suggestion-icon"><i class="fas fa-list-check"></i></div>
+                            <div class="suggestion-text"><strong>To-Do App</strong><span>Task management</span></div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="messages" id="messages"></div>
-        </div>
-
-        <div class="input-container">
-            <div class="input-wrapper">
-                <textarea id="promptInput" placeholder="Kirim pesan ke CodeAI..." rows="1"></textarea>
-                <div class="input-actions">
-                    <div class="input-options">
-                        <button class="option-btn" id="languageBtn">
-                            <i class="fas fa-code"></i>
-                            <span id="langLabel">Auto</span>
-                        </button>
-                        <select id="languageSelect" class="hidden-select">
-                            <option value="auto">Auto Detect</option>
-                            <option value="html">HTML/CSS/JS</option>
-                            <option value="python">Python</option>
-                            <option value="javascript">JavaScript</option>
-                            <option value="php">PHP</option>
-                            <option value="java">Java</option>
-                            <option value="cpp">C++</option>
-                            <option value="react">React</option>
-                            <option value="nodejs">Node.js</option>
-                            <option value="sql">SQL</option>
-                        </select>
+                <!-- Welcome Soal Mode (hidden by default) -->
+                <div class="welcome-screen hidden" id="welcomeSoal">
+                    <div class="welcome-logo" style="background:linear-gradient(135deg,#10b981,#059669)"><i class="fas fa-question-circle"></i></div>
+                    <h1>Mode <span class="gradient-text">Jawab Soal</span></h1>
+                    <p class="welcome-subtitle">Tempel soal atau ketik pertanyaan, saya bantu jawab</p>
+                    <div class="suggestion-grid">
+                        <div class="suggestion-card" data-prompt="Jelaskan cara menyelesaikan persamaan kuadrat x² - 5x + 6 = 0">
+                            <div class="suggestion-icon"><i class="fas fa-calculator"></i></div>
+                            <div class="suggestion-text"><strong>Matematika</strong><span>Persamaan kuadrat</span></div>
+                        </div>
+                        <div class="suggestion-card" data-prompt="Apa perbedaan antara sel hewan dan sel tumbuhan?">
+                            <div class="suggestion-icon"><i class="fas fa-dna"></i></div>
+                            <div class="suggestion-text"><strong>Biologi</strong><span>Sel hewan vs tumbuhan</span></div>
+                        </div>
                     </div>
-                    <button class="send-btn" id="sendBtn" disabled>
-                        <i class="fas fa-arrow-up"></i>
-                    </button>
                 </div>
+
+                <div class="messages" id="messages"></div>
             </div>
-            <p class="input-footer">
-                CodeAI bisa membuat kesalahan. Periksa kode sebelum digunakan.
-            </p>
-        </div>
-    </main>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea id="promptInput" placeholder="Kirim pesan ke CodeAI..." rows="1"></textarea>
+                    <div class="input-actions">
+                        <div class="input-options">
+                            <button class="option-btn" id="languageBtn" type="button"><i class="fas fa-code"></i><span id="langLabel">Auto</span></button>
+                            <select id="languageSelect" class="hidden-select">
+                                <option value="auto">Auto Detect</option>
+                                <option value="html">HTML/CSS/JS</option>
+                                <option value="python">Python</option>
+                                <option value="javascript">JavaScript</option>
+                                <option value="php">PHP</option>
+                                <option value="java">Java</option>
+                                <option value="cpp">C++</option>
+                                <option value="react">React</option>
+                                <option value="nodejs">Node.js</option>
+                                <option value="sql">SQL</option>
+                            </select>
+                        </div>
+                        <button class="send-btn" id="sendBtn" type="button" disabled><i class="fas fa-arrow-up"></i></button>
+                    </div>
+                </div>
+                <p class="input-footer">CodeAI bisa membuat kesalahan. Periksa sebelum digunakan.</p>
+            </div>
+        </main>
+    </div>
 
     <!-- PREVIEW MODAL -->
     <div class="modal preview-modal" id="previewModal">
         <div class="preview-content">
             <div class="preview-header">
                 <h2><i class="fas fa-eye"></i> Preview</h2>
-                <button class="modal-close" id="closePreview">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="modal-close" id="closePreview" type="button"><i class="fas fa-times"></i></button>
             </div>
             <iframe id="previewFrame"></iframe>
         </div>

@@ -7,31 +7,32 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
-    <!-- ============ LOGIN SCREEN (WAJIB) ============ -->
+    <!-- ============ LOGIN SCREEN ============ -->
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
             <div class="login-logo"><i class="fas fa-code"></i></div>
             <h1>CodeAI</h1>
             <p>Login dengan Google untuk mulai menggunakan</p>
-            <div id="g_id_onload"
-                 data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-                 data-callback="handleGoogleLogin"
-                 data-auto_prompt="false">
+
+            <div id="googleBtnContainer"></div>
+
+            <div id="loginLoading" class="login-loading">
+                <div class="spinner-small"></div>
+                <span>Memuat Google Sign-In...</span>
             </div>
-            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_black"></div>
+
+            <div id="loginError" class="login-error hidden"></div>
+
             <p class="login-note">Dengan login, kamu setuju menggunakan layanan ini secara bijak.</p>
         </div>
     </div>
 
-    <!-- ============ APP (SETELAH LOGIN) ============ -->
+    <!-- ============ APP ============ -->
     <div id="appContainer" class="app-container hidden">
 
-        <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
@@ -63,7 +64,6 @@
 
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- MAIN -->
         <main class="main">
             <header class="topbar">
                 <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
@@ -75,14 +75,12 @@
                 </div>
             </header>
 
-            <!-- Mode Tabs -->
             <div class="mode-tabs">
                 <button class="mode-tab active" data-mode="code"><i class="fas fa-code"></i> Buat Code</button>
                 <button class="mode-tab" data-mode="soal"><i class="fas fa-question-circle"></i> Jawab Soal</button>
             </div>
 
             <div class="chat-container" id="chatContainer">
-                <!-- Welcome Code Mode -->
                 <div class="welcome-screen" id="welcomeScreen">
                     <div class="welcome-logo"><i class="fas fa-code"></i></div>
                     <h1>Halo, saya <span class="gradient-text">CodeAI</span></h1>
@@ -99,7 +97,6 @@
                     </div>
                 </div>
 
-                <!-- Welcome Soal Mode (hidden by default) -->
                 <div class="welcome-screen hidden" id="welcomeSoal">
                     <div class="welcome-logo" style="background:linear-gradient(135deg,#10b981,#059669)"><i class="fas fa-question-circle"></i></div>
                     <h1>Mode <span class="gradient-text">Jawab Soal</span></h1>
@@ -146,7 +143,6 @@
         </main>
     </div>
 
-    <!-- PREVIEW MODAL -->
     <div class="modal preview-modal" id="previewModal">
         <div class="preview-content">
             <div class="preview-header">

@@ -10,7 +10,6 @@ const promptInput = document.getElementById('promptInput');
 const sendBtn = document.getElementById('sendBtn');
 const messagesEl = document.getElementById('messages');
 const welcomeScreen = document.getElementById('welcomeScreen');
-const welcomeSoal = document.getElementById('welcomeSoal');
 const chatContainer = document.getElementById('chatContainer');
 const newChatBtn = document.getElementById('newChatBtn');
 const newChatLargeBtn = document.getElementById('newChatLargeBtn');
@@ -26,13 +25,20 @@ const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
 const historyList = document.getElementById('historyList');
+const uploadBtn = document.getElementById('uploadBtn');
+const fileInput = document.getElementById('fileInput');
+const imagePreviewBar = document.getElementById('imagePreviewBar');
+const imgThumb = document.getElementById('imgThumb');
+const removeImgBtn = document.getElementById('removeImgBtn');
 
 // ============================================================
 // STATE
 // ============================================================
-let currentMode = 'code';
+let currentMode = 'chat'; // 'chat' | 'code' | 'soal'
 let chatHistory = [];
 let isGenerating = false;
+let pendingImageBase64 = null; // data URL gambar
+let pendingImageType = null;   // mime type
 
 // ============================================================
 // INIT
@@ -70,15 +76,15 @@ modeTabs.forEach(tab => {
         messagesEl.innerHTML = '';
         chatHistory = [];
 
+        welcomeScreen.classList.remove('hidden');
         if (currentMode === 'code') {
-            welcomeScreen.classList.remove('hidden');
-            welcomeSoal.classList.add('hidden');
-            promptInput.placeholder = 'Kirim pesan ke Bye Zimzz...';
+            promptInput.placeholder = 'Minta code apa ke Bye Zimzz...';
             languageBtn.style.display = 'flex';
-        } else {
-            welcomeScreen.classList.add('hidden');
-            welcomeSoal.classList.remove('hidden');
+        } else if (currentMode === 'soal') {
             promptInput.placeholder = 'Tempel soal atau ketik pertanyaan...';
+            languageBtn.style.display = 'none';
+        } else {
+            promptInput.placeholder = 'Tanya apa saja ke Bye Zimzz...';
             languageBtn.style.display = 'none';
         }
     });
@@ -93,51 +99,9 @@ languageSelect.addEventListener('change', () => {
 });
 
 // ============================================================
-// TEXTAREA
+// IMAGE UPLOAD
 // ============================================================
-promptInput.addEventListener('input', () => {
-    promptInput.style.height = 'auto';
-    promptInput.style.height = Math.min(promptInput.scrollHeight, 200) + 'px';
-    sendBtn.disabled = !promptInput.value.trim() || isGenerating;
-});
-promptInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        if (!sendBtn.disabled) sendBtn.click();
-    }
-});
+uploadBtn.addEventListener('click', () => fileInput.click());
 
-// ============================================================
-// SUGGESTIONS
-// ============================================================
-document.querySelectorAll('.suggestion-card').forEach(card => {
-    card.addEventListener('click', () => {
-        promptInput.value = card.dataset.prompt || '';
-        promptInput.dispatchEvent(new Event('input'));
-        promptInput.focus();
-    });
-});
-
-// ============================================================
-// NEW CHAT
-// ============================================================
-function startNewChat() {
-    messagesEl.innerHTML = '';
-    chatHistory = [];
-    promptInput.value = '';
-    promptInput.style.height = 'auto';
-    sendBtn.disabled = true;
-    sidebar.classList.remove('open');
-    sidebarOverlay.classList.remove('active');
-    if (currentMode === 'code') welcomeScreen.classList.remove('hidden');
-    else welcomeSoal.classList.remove('hidden');
-    promptInput.focus();
-}
-newChatBtn.addEventListener('click', startNewChat);
-newChatLargeBtn.addEventListener('click', startNewChat);
-
-// ============================================================
-// PREVIEW
-// ============================================================
-closePreview.addEventListener('click', () => previewModal.classList.remove('active'));
-previewModal.addEventListener
+fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0
